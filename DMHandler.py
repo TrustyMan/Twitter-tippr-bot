@@ -7,7 +7,7 @@ import config
 
 dmLogFile = 'dmLog.txt'
 dm_replied_to_file = 'dm_replied_to.txt'
-user_id = '1057726220715012096'
+user_id = '1100749378426261504'
 
 #daemon core
 core = "/home/RonTipsProject/ronpaulcoind"
@@ -34,6 +34,8 @@ def run_bot(dm_replied_to):
                 message_id = dm['id']
                 print 'message_id: ' + message_id
                 print 'message: ' + message
+                print 'sender_id:'+ sender_id
+                print 'recipient_id:'+recipient_id
                 if message_id not in dm_replied_to:
                     try:
                         print 'new messsage'
@@ -42,7 +44,7 @@ def run_bot(dm_replied_to):
                         dm_replied_to.append(message_id)
                         with open (dm_replied_to_file, "a") as f:
                             f.write(message_id + "\n")
-                        if sender_id == user_id:
+                        if recipient_id == user_id:
                             print 'message from other'
                             dm_handler(sender_id, recipient_id, message, logfile)
                     except:
@@ -60,10 +62,10 @@ def dm_handler(sender_id, recipient_id, message, logfile):
         if len(message.split())==1:
             # get balance data by running daemon ronpaulcoind
             balance = subprocess.check_output([core,"getbalance", accountStr])[:-1]
-            send_dm(recipient_id, balance)
+            send_dm(sender_id, balance)
             print 'balance:'+balance
         else:
-            send_dm(recipient_id, 'Usage in PM: `balance`')
+            send_dm(sender_id, 'Usage in PM: `balance`')
             print 'Balance error'
     elif 'deposit' in message.lower():
         print 'inside the deposit'
@@ -73,9 +75,9 @@ def dm_handler(sender_id, recipient_id, message, logfile):
             deposit = subprocess.check_output([core,"getaccountaddress", accountStr])[:-1]
             print deposit
             print 'Deposit\nYour depositing Your depositing address is: {0}'.format(deposit)
-            send_dm(recipient_id, "Your depositing address is: {0}".format(deposit))
+            send_dm(sender_id, "Your depositing address is: {0}".format(deposit))
         else:
-            send_dm(recipient_id, "Usage in PM: `deposit`")
+            send_dm(sender_id, "Usage in PM: `deposit`")
             print 'Deposit error\nUsage in PM: `deposit`'
     elif 'withdraw' in message.lower():
         if len(message.split())==3:
@@ -92,13 +94,13 @@ def dm_handler(sender_id, recipient_id, message, logfile):
                     # sendfrom <fromaccount> <toronpaulcoinaddress> <amount> [minconf=1] [comment] [comment-to]
                     tx = subprocess.check_output([core,"sendfrom",accountStr,address,amount])[:-1]
                     # {0} has successfully withdrew to address: {1} of {2} RDD"
-                    send_dm(recipient_id, "You have successfully withdrew to address: {0} of {1} RPC".format(address,amount))
+                    send_dm(sender_id, "You have successfully withdrew to address: {0} of {1} RPC".format(address,amount))
                     print 'Withdraw success\nYou have successfully withdrew to address: {0} of {1} RPC'.format(address,amount)
             except ValueError:
-                send_dm(recipient_id, "Usage in PM: `withdraw <amount> <address>`")
+                send_dm(sender_id, "Usage in PM: `withdraw <amount> <address>`")
                 print 'Withdraw error\nUsage in PM: `withdraw <amount> <address>`'
         else:
-            send_dm(recipient_id, "Usage in PM: `withdraw <amount> <address>`")
+            send_dm(sender_id, "Usage in PM: `withdraw <amount> <address>`")
             print 'Withdraw error\nUsage in PM: `withdraw <amount> <address>`'
 
 def send_dm(recipient_id, message):
