@@ -11,6 +11,7 @@ user_id = '1100749378426261504'
 
 #daemon core
 core = "/home/RonTipsProject/ronpaulcoind"
+# core = "/home/akra/Documents/ronpaulcoind"
 
 CONSUMER_KEY = 'WwcjStPWdebXlAd48KlULR4qm'
 CONSUMER_SECRET = 'QPbtxFIrkUMNCRIfR7dlt5NZvkjZ0s4qCsHVGcnCWANbhdnlaJ'
@@ -59,6 +60,7 @@ def dm_handler(sender_id, recipient_id, message, logfile):
     print "wallet accountname: {0}".format(accountStr)
     print "message lowered:" + message.lower()
     if 'balance' in message.lower():
+        print 'inside the balance'
         if len(message.split())==1:
             # get balance data by running daemon ronpaulcoind
             balance = subprocess.check_output([core,"getbalance", accountStr])[:-1]
@@ -80,6 +82,7 @@ def dm_handler(sender_id, recipient_id, message, logfile):
             send_dm(sender_id, "Usage in PM: `deposit`")
             print 'Deposit error\nUsage in PM: `deposit`'
     elif 'withdraw' in message.lower():
+        print 'inside the withdraw'
         if len(message.split())==3:
             try:
                 amount = float(message.split()[1])
@@ -87,7 +90,7 @@ def dm_handler(sender_id, recipient_id, message, logfile):
                 # accountStr = 'reddit-{0}'.format(item.author.name)
                 balance = float(subprocess.check_output([core,"getbalance", accountStr])[:-1])
                 if balance < amount:
-                    send_dm(recipient_id, "You have insufficent funds.")
+                    send_dm(sender_id, "You have insufficent funds.")
                     print 'Withdraw error\nYou have insufficent funds.'
                 else:
                     amount = str(amount)
