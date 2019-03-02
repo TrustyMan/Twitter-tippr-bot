@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from TwitterAPI import TwitterAPI
 import json
 import subprocess
@@ -52,7 +53,7 @@ def run_bot(dm_replied_to):
                         logfile.write('to frequent\n')
         except:
             print 'error'
-        time.sleep(60)
+        time.sleep(120)
 
 def dm_handler(sender_id, recipient_id, message, logfile):
     print 'sending direct messages...'
