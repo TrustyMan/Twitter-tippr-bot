@@ -52,7 +52,7 @@ def run_bot(dm_replied_to):
                         logfile.write('to frequent\n')
         except:
             print 'error'
-        time.sleep(10)
+        time.sleep(60)
 
 def dm_handler(sender_id, recipient_id, message, logfile):
     print 'sending direct messages...'
