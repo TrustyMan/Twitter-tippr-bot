@@ -14,8 +14,8 @@ user_id = '1100749378426261504'
 # tweet['in_reply_to_user_id'] // TipBot id
 
 #daemon core
-# core = "/home/akra/Documents/TwitterTipBot/ronpaulcoind"
-core = "/home/akra/Documents/ronpaulcoind"
+core = "/home/akra/Documents/TwitterTipBot/ronpaulcoind"
+# core = "/home/akra/Documents/ronpaulcoind"
 
 CONSUMER_KEY = 'WwcjStPWdebXlAd48KlULR4qm'
 CONSUMER_SECRET = 'QPbtxFIrkUMNCRIfR7dlt5NZvkjZ0s4qCsHVGcnCWANbhdnlaJ'
@@ -92,24 +92,21 @@ def tip(sender_id, sender_name, message):
                     print recipient
                     recipient_id = get_user_id_from_name(recipient)
                     if recipient_id != 'error': # if it is valid user
-                        print 'no error'
-                        print recipient_id
                         senderStr = 'twitter-{0}'.format(sender_id)
                         receiverStr = 'twitter-{0}'.format(recipient_id)
                         result = subprocess.check_output([core,"getbalance", senderStr])[:-1]
-                        print 'error here'
                         balance = float(result)
-                        print"balance:\n{0}".format(balance)
-                        print "---------------\n"
-                        print "receiver:\n{0}".format(receiverStr)
-                        print "sender:\n{0}".format(senderStr)
+                        print.write("balance:\n{0}".format(balance))
+                        print.write("---------------\n")
+                        print.write("receiver:\n{0}".format(receiverStr))
+                        print.write("sender:\n{0}".format(senderStr))
                         if balance < amount:
                             send_dm(sender_id, "{0}, you have insufficent funds.".format(sender_name))
                             print "{0}, you have insufficent funds.".format(sender_name)
                         elif receiver == sender:
                             # comment.reply("You can't tip yourself silly.")
-                            send_dm(sender_id, "You can't tip yourself silly.")
-                            print "You can't tip yourself silly."
+                            reddit.redditor(sender).message('Tip error', "You can't tip yourself silly.")
+                            logfile.write("You can't tip yourself silly.")
                         else:
                             balance = str(balance)
                             amount = str(amount)
@@ -144,17 +141,15 @@ def reply_to_tweets(api):
     print 'retrieving and replying to tweets...'
     last_seen_id = retrieve_last_seen_id(FILE_NAME)
     try:
-        print last_seen_id
-        mentions = get_tweets(last_seen_id)
+        mentions = api.mentions_timeline(last_seen_id,tweet_mode='extended')
+        # print mentions
         for mention in reversed(mentions):
-            print last_seen_id
             last_seen_id = mention['id'] # save last seen tweet id
             store_last_seen_id(last_seen_id, FILE_NAME) # save last seen id to file
             message = mention['text'].lower()
             sender_id = mention['user']['id'] # tip sender id
-            sender_name = mention['user']['screen_name']
             if 'tip' == message.split()[1]:
-                tip(sender_id, sender_name, message)
+                tip(sender_id, message)
             # if '#helloworld' in mention.text.lower():
             #     print 'found #helloworld'
             # api.update_status('@' + mention.user.screen_name + '#helloworld back to you!', mention.id) # tweet reply
