@@ -14,8 +14,7 @@ user_id = '1100749378426261504'
 # tweet['in_reply_to_user_id'] // TipBot id
 
 #daemon core
-# core = "/home/akra/Documents/TwitterTipBot/ronpaulcoind"
-core = "/home/akra/Documents/ronpaulcoind"
+core = "/home/RonTipsProject/ronpaulcoind"
 
 CONSUMER_KEY = 'WwcjStPWdebXlAd48KlULR4qm'
 CONSUMER_SECRET = 'QPbtxFIrkUMNCRIfR7dlt5NZvkjZ0s4qCsHVGcnCWANbhdnlaJ'
