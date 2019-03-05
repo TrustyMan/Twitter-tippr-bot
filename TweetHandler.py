@@ -106,7 +106,7 @@ def tip(sender_id, sender_name, message):
                         if balance < amount:
                             send_dm(sender_id, "{0}, you have insufficent funds.".format(sender_name))
                             print "{0}, you have insufficent funds.".format(sender_name)
-                        elif receiver == sender:
+                        elif recipient == sender_name:
                             # comment.reply("You can't tip yourself silly.")
                             send_dm(sender_id, "You can't tip yourself silly.")
                             print "You can't tip yourself silly."
