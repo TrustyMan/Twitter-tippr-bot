@@ -33,6 +33,13 @@ def get_tweets(last_seen_id):
     tweets = api.request('statuses/mentions_timeline',{ 'since_id':last_seen_id }).json()
     return tweets
 
+def send_notification(message, tweet_id):
+    reply_message = api.request('statuses/update',{'status':message, 'in_reply_to_status_id':tweet_id})
+    if reply_message['errors']:
+        return 'error'
+    else:
+        return 'success'
+
 def send_dm(recipient_id, message):
     event = {
         "event": {
@@ -76,7 +83,7 @@ def store_last_seen_id(last_seen_id, file_name):
     f_write.close()
     return
 
-def tip(sender_id, sender_name, message):
+def tip(sender_id, sender_name, tweet_id, message):
     print 'it is inside tip function\n'
     # sender = comment.author.name.lower()
     if len(message.split()) == 4:
@@ -103,11 +110,13 @@ def tip(sender_id, sender_name, message):
                         print "receiver:\n{0}".format(receiverStr)
                         print "sender:\n{0}".format(senderStr)
                         if balance < amount:
-                            send_dm(sender_id, "{0}, you have insufficent funds.".format(sender_name))
+                            # send_dm(sender_id, "{0}, you have insufficent funds.".format(sender_name))
+                            send_notification("@{0}, you have insufficent funds.".format(sender_name), tweet_id)
                             print "{0}, you have insufficent funds.".format(sender_name)
                         elif recipient == sender_name:
                             # comment.reply("You can't tip yourself silly.")
-                            send_dm(sender_id, "You can't tip yourself silly.")
+                            # send_dm(sender_id, "You can't tip yourself silly.")
+                            send_notification("@{0}, you can't tip yourself silly.".format(sender_name), tweet_id)
                             print "You can't tip yourself silly."
                         else:
                             balance = str(balance)
@@ -120,23 +129,28 @@ def tip(sender_id, sender_name, message):
                             tx = subprocess.check_output([core,"move",senderStr,receiverStr,amount])[:-1]
                             # comment.reply("@{0} tipped @{1}RPC to @{2}".format(sender, amount, receiver))
                             # reddit.redditor(sender).message('Tip', "@{0} tipped @{1}RPC to @{2}".format(sender, amount, receiver))
-                            send_dm(recipient_id, "{0} tipped you {1} of Ron Paul Coin via the RonTips4Liberty tipping bot. For  instructions on how to withdraw, tip other users & more, visit https://www.reddit.com/r/RonTips4Liberty/wiki/index".format(sender_name, amount))
+                            # send_dm(recipient_id, "{0} tipped you {1} of Ron Paul Coin via the RonTips4Liberty tipping bot. For  instructions on how to withdraw, tip other users & more, visit https://www.reddit.com/r/RonTips4Liberty/wiki/index".format(sender_name, amount))
+                            send_notification("@{0}, {1} tipped you {2} of Ron Paul Coin via the RonTips4Liberty tipping bot. For  instructions on how to withdraw, tip other users & more, visit https://www.reddit.com/r/RonTips4Liberty/wiki/index".format(recipient, sender_name, amount), tweet_id)
                             print "{0} tipped {1}RPC to you".format(sender_name, amount)
                     else:
-                        send_dm(sender_id, "Invalid user error!")
+                        # send_dm(sender_id, "Invalid user error!")
+                        send_notification("@{0}, invalid user error!".format(sender_name), tweet_id)
                         print "Invalid user error!"
                 except Exception as ex:
                     template = "An exception of type {0} occurred. Arguments:\n{1!r}"
                     message = template.format(type(ex).__name__, ex.args)
                     print message
             else:
-                send_dm(sender_id, "Usage in comment: `tip <amount> @<username>`")
+                # send_dm(sender_id, "Usage in comment: `tip <amount> @<username>`")
+                send_notification("Usage in comment: `tip <amount> @<username>`", tweet_id)
                 print 'Tip error: {0}'.format(message)
         except ValueError:
-            send_dm(sender_id, "Usage in comment: `tip <amount> @<username>`")
+            # send_dm(sender_id, "Usage in comment: `tip <amount> @<username>`")
+            send_notification("Usage in comment: `tip <amount> @<username>`", tweet_id)
             print 'Tip amount error: {0}'.format(message)
     else:
-        send_dm(sender_id, "Usage in comment: `tip <amount> @<username>`")
+        # send_dm(sender_id, "Usage in comment: `tip <amount> @<username>`")
+        send_notification("Usage in comment: `tip <amount> @<username>`", tweet_id)
         print 'Tip format error: {0}'.format(message)
 
 def reply_to_tweets(api):
@@ -153,7 +167,7 @@ def reply_to_tweets(api):
             sender_id = mention['user']['id'] # tip sender id
             sender_name = mention['user']['screen_name']
             if 'tip' == message.split()[1]:
-                tip(sender_id, sender_name, message)
+                tip(sender_id, sender_name, last_seen_id, message)
             # if '#helloworld' in mention.text.lower():
             #     print 'found #helloworld'
             # api.update_status('@' + mention.user.screen_name + '#helloworld back to you!', mention.id) # tweet reply
