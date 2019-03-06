@@ -65,7 +65,7 @@ def dm_handler(sender_id, recipient_id, message, logfile):
         if len(message.split())==1:
             # get balance data by running daemon ronpaulcoind
             balance = subprocess.check_output([core,"getbalance", accountStr])[:-1]
-            send_dm(sender_id, balance)
+            send_dm(sender_id, 'Your balance is {0} RPC'.format(balance))
             print 'balance:'+balance
         else:
             send_dm(sender_id, 'Usage in PM: `balance`')
@@ -78,7 +78,7 @@ def dm_handler(sender_id, recipient_id, message, logfile):
             deposit = subprocess.check_output([core,"getaccountaddress", accountStr])[:-1]
             print deposit
             print 'Deposit\nYour depositing Your depositing address is: {0}'.format(deposit)
-            send_dm(sender_id, "Your depositing address is: {0}".format(deposit))
+            send_dm(sender_id, "Your Ron Paul Coin depositing address is: {0}".format(deposit))
         else:
             send_dm(sender_id, "Usage in PM: `deposit`")
             print 'Deposit error\nUsage in PM: `deposit`'
@@ -98,13 +98,13 @@ def dm_handler(sender_id, recipient_id, message, logfile):
                     # sendfrom <fromaccount> <toronpaulcoinaddress> <amount> [minconf=1] [comment] [comment-to]
                     tx = subprocess.check_output([core,"sendfrom",accountStr,address,amount])[:-1]
                     # {0} has successfully withdrew to address: {1} of {2} RDD"
-                    send_dm(sender_id, "You have successfully withdrew to address: {0} of {1} RPC".format(address,amount))
+                    send_dm(sender_id, "You have successfully withdrawn {0} RPC to address: {1}".format(amount,address))
                     print 'Withdraw success\nYou have successfully withdrew to address: {0} of {1} RPC'.format(address,amount)
             except ValueError:
-                send_dm(sender_id, "Usage in PM: `withdraw <amount> <address>`")
+                send_dm(sender_id, "To withdraw your Ron Paul Coin please PM the following: withdraw <amount> <address>")
                 print 'Withdraw error\nUsage in PM: `withdraw <amount> <address>`'
         else:
-            send_dm(sender_id, "Usage in PM: `withdraw <amount> <address>`")
+            send_dm(sender_id, "To withdraw your Ron Paul Coin please PM the following: withdraw <amount> <address>")
             print 'Withdraw error\nUsage in PM: `withdraw <amount> <address>`'
 
 def send_dm(recipient_id, message):
